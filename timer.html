@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+		<meta name="format-detection" content="telephone=no,email=no,date=no,address=no" />
+		<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+		<style type="text/css">
+			.box {
+				padding: 10px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="app">
+			<div class="box" style="padding-top: 20px;">
+				<el-radio v-model="radio" label="1" @change="checkType()">计算收益</el-radio>
+				<el-radio v-model="radio" label="2" @change="checkType()">计算利率</el-radio>
+			</div>
+			<div class="box">
+				开始日期
+				<el-date-picker
+				      v-model="beginTime"
+				      type="date"
+					  format="yyyy-MM-dd"
+				      placeholder="开始日期"
+					  @change="sureBegin()">
+				</el-date-picker>
+			</div>
+			<div class="box">
+				结束日期
+				<el-date-picker
+				      v-model="endTime"
+				      type="date"
+					  format="yyyy-MM-dd"
+				      placeholder="结束日期"
+					  @change="sureEnd()">
+				</el-date-picker>
+			</div>
+			<div class="box">
+				<el-button type="primary">投资总天数(自动计算)：{{allDate}}</el-button>
+			</div>
+			<div class="box">
+				投资本金总金额：<el-input type="number" v-model="moneyAll" placeholder="请输入本金总金额"></el-input>
+			</div>
+			<div class="box">
+				年利率（365%）：<el-input type="number" :disabled="!isAbled" v-model="rate" placeholder="请输入年利率"></el-input>
+			</div>
+			<div class="box">
+				总收益：<el-input type="number" :disabled="isAbled" v-model="income" placeholder="请输入总收益"></el-input>
+			</div>
+			<div class="box" style="text-align: center;">
+				<el-button type="primary" @click="countRs()">点击计算</el-button>
+			</div>
+		</div>
+	</body>
+	<script src="https://unpkg.com/vue/dist/vue.js"></script>
+	<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+	<script>
+		new Vue({
+			el: '#app',
+			data: function() {
+				return {
+					beginTime:'',
+					endTime:'',
+					isAbled: true,
+					income: '',
+					rate: '',
+					moneyAll: '',
+					allDate: 0,
+					radio: '1',
+					pickerOptions: {
+						shortcuts: [{
+							text: '最近一周',
+							onClick(picker) {
+								const end = new Date();
+								const start = new Date();
+								start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+								picker.$emit('pick', [start, end]);
+							}
+						}, {
+							text: '最近一个月',
+							onClick(picker) {
+								const end = new Date();
+								const start = new Date();
+								start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+								picker.$emit('pick', [start, end]);
+							}
+						}, {
+							text: '最近三个月',
+							onClick(picker) {
+								const end = new Date();
+								const start = new Date();
+								start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+								picker.$emit('pick', [start, end]);
+							}
+						}]
+					},
+				}
+			},
+			created: function() {},
+			methods: {
+				countRs: function() {
+					if(!this.beginTime){
+						alert('请选择开始日期');
+						return;
+					}
+					if(!this.endTime){
+						alert('请选择结束日期');
+						return;
+					}
+					if (this.radio == 1) {
+						this.income = parseFloat(this.moneyAll) * parseFloat(this.rate) / 100 * parseInt(this.allDate) / 365;
+					} else {
+						this.rate = parseFloat(this.income) * 365 / (parseFloat(this.moneyAll) * parseInt(this.allDate)) * 100;
+					}
+				},
+				sureBegin:function(){
+					if(this.endTime!=''&&this.endTime!=null&&this.endTime!=undefined){
+						if(this.beginTime>this.endTime){
+							alert('开始日期不能大于结束日期');
+							this.beginTime='';
+							return;
+						}
+						this.getDaysBetween(this.beginTime, this.endTime)
+					}
+				},
+				sureEnd: function() {
+					if(!this.beginTime){
+						alert('请先选择开始日期');
+						this.endTime='';
+						return;
+					}
+					if(this.beginTime>this.endTime){
+						alert('开始日期不能大于结束日期');
+						this.endTime='';
+						return;
+					}
+					this.getDaysBetween(this.beginTime, this.endTime)
+				},
+				checkType: function() {
+					this.income = this.moneyAll = this.rate =this.beginTime=this.endTime ='';
+					this.allDate = 0;
+					if (this.radio == 1) {
+						this.isAbled = true;
+					} else {
+						this.isAbled = false;
+					}
+				},
+				getDaysBetween: function(dateString1, dateString2) {
+					
+					var startDate = Date.parse(dateString1);
+					var endDate = Date.parse(dateString2);
+					var days = (endDate - startDate) / (1 * 24 * 60 * 60 * 1000);
+					this.allDate = Number(days) + 1;
+				}
+			}
+		})
+	</script>
+</html>
