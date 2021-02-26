@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no" />
+    <style type="text/css">
+      * {
+        outline: none;
+      }
+
+      input[type="text"] {
+        height: 22px;
+        line-height: 22px;
+        padding: 0;
+      }
+
+      #app {
+        padding: 10px;
+        margin: 0;
+      }
+
+      #app>div {
+        margin: 10px 0
+      }
+
+      label {
+        cursor: pointer;
+      }
+
+      #all-time {
+        font-weight: 700;
+        color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <div style="cursor: pointer">
+        <input class="radioObj" type="radio" name="set" id="male" checked />
+        <label for="male">计算收益</label>
+        <input class="radioObj" type="radio" name="set" id="female" />
+        <label for="female">计算利率</label>
+      </div>
+      <div>开始日期：<input type="text" placeholder="格式为:yyyy-mm-dd" id="time1"></div>
+      <div>结束日期：<input type="text" placeholder="格式为:yyyy-mm-dd" id="time2"></div>
+      <div class="all_day">投资总天数：<span id="all-time">0</span></div>
+      <div>本金总额：<input type="text" placeholder="输入数字" id="allMoney"></div>
+      <div>年利率：<input type="text" placeholder="输入数字" id="yearRate"></div>
+      <div>总收益：<input type="text" placeholder="输入数字" id="allGet"></div>
+      <div> <button onclick="reset()">重置</button> &nbsp;&nbsp;&nbsp;<button id="setRsBtn">计算</button>
+      </div>
+    </div>
+
+  </body>
+  <script>
+    function reset() {
+      document.getElementById('time1').value = document.getElementById('time2').value = document.getElementById(
+        'allMoney').value = document.getElementById('yearRate').value = document.getElementById('allGet').value = '';
+      document.getElementById('all-time').innerHTML = 0;
+    }
+
+    function sumFn() {
+      var dateString1 = document.getElementById('time1').value;
+      var dateString2 = document.getElementById('time2').value;
+
+      var startDate = Date.parse(dateString1);
+      var endDate = Date.parse(dateString2);
+      var days = (endDate - startDate) / (1 * 24 * 60 * 60 * 1000);
+      var allDay = document.getElementById('all-time');
+
+      allDay.innerHTML = Number(days) + 1;
+
+      var oGet = document.getElementById('allGet');
+      var oMoney = document.getElementById('allMoney').value;
+      var oRate = document.getElementById('yearRate').value;
+
+      oGet.value = parseFloat(Number(oMoney)) * parseFloat(Number(oRate)) / 100 * parseInt(Number(allDay.innerHTML)) /
+        360;
+
+    }
+
+    function rateFn() {
+      var dateString1 = document.getElementById('time1').value;
+      var dateString2 = document.getElementById('time2').value;
+
+      var startDate = Date.parse(dateString1);
+      var endDate = Date.parse(dateString2);
+      var days = (endDate - startDate) / (1 * 24 * 60 * 60 * 1000);
+      var allDay = document.getElementById('all-time');
+
+      allDay.innerHTML = Number(days) + 1;
+
+      var oGet = document.getElementById('allGet').value;
+      var oMoney = document.getElementById('allMoney').value;
+      var oRate = document.getElementById('yearRate');
+
+      oRate.value = parseFloat(Number(oGet)) * 360 / (parseFloat(Number(oMoney)) * parseInt(Number(allDay.innerHTML))) *
+        100;
+    }
+    var btn = document.getElementById('setRsBtn');
+    btn.addEventListener('click', sumFn);
+
+    var arr = document.getElementsByClassName('radioObj');
+    for (var i = 0; i < arr.length; i++) {
+      arr[i].addEventListener('click', function(_this) {
+
+        if (_this.target.id == 'male') {
+          btn.removeEventListener('click', rateFn)
+          btn.addEventListener('click', sumFn)
+        } else {
+          btn.removeEventListener('click', sumFn)
+          btn.addEventListener('click', rateFn)
+        }
+      });
+    }
+  </script>
+</html>
